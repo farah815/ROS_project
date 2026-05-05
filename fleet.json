@@ -1,0 +1,56 @@
+{
+    "drones": [
+        {
+            "drone_id": "D1",
+            "max_payload": 10,
+            "battery": 100,
+            "position": [
+                0,
+                0
+            ],
+            "status": "delivering",
+            "package_id": "P1"
+        },
+        {
+            "drone_id": "D2",
+            "max_payload": 5,
+            "battery": 100,
+            "position": [
+                0,
+                0
+            ],
+            "status": "idle",
+            "package_id": null
+        }
+    ],
+    "packages": [
+        {
+            "package_id": "P1",
+            "weight": 3,
+            "destination": [
+                4,
+                5
+            ],
+            "status": "in_transit"
+        },
+        {
+            "package_id": "P2",
+            "weight": 6,
+            "destination": [
+                2,
+                8
+            ],
+            "status": "waiting"
+        }
+    ],
+    "no_fly_zones": [
+        [
+            1,
+            1
+        ],
+        [
+            2,
+            2
+        ]
+    ]
+}
