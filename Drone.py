@@ -1,6 +1,7 @@
 class Drone:
-    def __init__(self, drone_id, max_payload, battery=100) :
+    def __init__(self, drone_id,mass, max_payload, battery=100) :
         self.drone_id=drone_id
+        self.mass = mass
         self.max_payload=max_payload
         self.battery=battery
         self.position = (0, 0)            
@@ -43,16 +44,22 @@ class Drone:
         self.status = "idle"
         self.package_id = None    
     
-    def should_return_home(self, steps_to_home):
+    def should_return_home(self, current_pos, efficiency=0.005, safety_margin=10):
    
-      battery_needed = steps_to_home * 2  
-      safety_margin = 5                   
     
-      return self.battery <= battery_needed + safety_margin
+     dist_to_base = abs(current_pos[0]) + abs(current_pos[1])
+    
+    
+     g = 9.81
+     energy_needed_to_return = dist_to_base * (self.mass * g * efficiency)
+    
+   
+     return self.battery <= (energy_needed_to_return + safety_margin)
 
     def to_dict(self):
      return {
         "drone_id": self.drone_id,
+        "mass": self.mass,
         "max_payload": self.max_payload,
         "battery": self.battery,
         "position": list(self.position),
@@ -66,6 +73,7 @@ class Drone:
     def from_dict(data):
      drone = Drone(
         data["drone_id"],
+        data["mass"],
         data["max_payload"],
         data["battery"]
     )

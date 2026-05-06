@@ -3,10 +3,10 @@ from ability_test import check_preflight_feasibility
 def orchestrate_missions(grid_obj, fleet_dict):
     schedule = {}
     # ترتيب الأولوية: الأثقل حملاً والأقل بطارية أولاً
-    sorted_fleet = sorted(fleet_dict.items(), key=lambda x: ((x[1]['payload']+2.0)*9.81)/x[1]['battery'], reverse=True)
+    sorted_fleet = sorted(fleet_dict.items(), key=lambda x: ((x[1]['payload']+x[1]['drone_mass'])*9.81)/x[1]['battery'], reverse=True)
 
     for d_id, info in sorted_fleet:
-        can_fly, msg = check_preflight_feasibility(2.0, info['payload'], info['battery'], (0,0), info['target'], info['max_battery'])
+        can_fly, msg = check_preflight_feasibility(info['drone_mass'], info['payload'], info['battery'], (0,0), info['target'], info['max_battery'])
         if not can_fly:
             schedule[d_id] = {"status": "Failed", "reason": msg}; continue
 

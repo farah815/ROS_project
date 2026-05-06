@@ -5,6 +5,7 @@ from grid import Grid
 from Orchestrator import orchestrate_missions
 from Weather_System import WeatherSystem
 from simulation import simulation
+from Execution import execute_flight
 
 def main():
     fleet = Fleet()
@@ -28,10 +29,11 @@ def main():
         choice = input("Enter choice: ")
 
         if choice == "1":
-            drone_id = input("Drone ID: ")
+            drone_id = input("Enter Drone ID: ").strip().upper()
+            drone_mass = float(input("Drone mass: "))
             max_payload = int(input("Max Payload: "))
             battery = int(input("Battery (default 100): ") or 100)
-            drone = Drone(drone_id, max_payload, battery)
+            drone = Drone(drone_id,drone_mass ,max_payload, battery)
             fleet.add_drone(drone)
             print("✅ Drone added")
 
@@ -71,8 +73,6 @@ def main():
                 print(d)
 
         elif choice == "9":
-           
-
             # Build the grid
             grid = Grid(20, 20)
             grid.register_no_fly_zones([tuple(z) for z in fleet.no_fly_zones])
@@ -86,32 +86,50 @@ def main():
                                if p.package_id == drone.package_id), None)
                     if pkg:
                         fleet_dict[drone.drone_id] = {
-                            "target": pkg.destination,
-                            "battery": drone.battery,
-                            "max_battery": 100,
-                            "payload": pkg.weight
+                         "target": pkg.destination,
+                         "battery": drone.battery,
+                         "max_battery": 100,
+                         "payload": pkg.weight,
+                         "drone_mass": drone.mass   
                         }
 
             if not fleet_dict:
-                print("⚠️  No drones have packages assigned. Use option 4 first.")
+                print("⚠️ No drones have packages assigned. Use option 4 first.")
             else:
                 # Plan all missions
+                print("\n[Phase 1] Planning & Scheduling Missions...")
                 planned = orchestrate_missions(grid, fleet_dict)
 
-                # Build routes for simulation
+                # Execute flights with real-time monitoring
+                print("\n[Phase 2] Executing Flights with Dynamic Monitoring...")
                 routes = []
                 drones_to_simulate = []
 
                 for d_id, result in planned.items():
                     if result["status"] == "Success":
-                        path_coords = [node for node, t in result["path"]]
-                        routes.append(path_coords)
-                        drone_obj = next(d for d in fleet.drones
-                                        if d.drone_id == d_id)
-                        drones_to_simulate.append(drone_obj)
-                        print(f"✅ {d_id}: planned ({len(path_coords)} steps)")
+                        
+                        # --- FIX: FIND THE DRONE OBJECT ---
+                        # This line prevents the UnboundLocalError
+                        drone_obj = next((d for d in fleet.drones if d.drone_id == d_id), None)
+
+                        if drone_obj is not None:
+                            status, actual_path = execute_flight(
+                                grid, 
+                                d_id, 
+                                result["path"],
+                                fleet_dict[d_id], 
+                                weather,
+                                drone_obj  # Now correctly associated with a value[cite: 3]
+                            )
+                            
+                            print(f"  {'✅' if 'Success' in status else '⚠️ '} {d_id}: {status} "
+                                  f"| delay={result['delay']}s | steps={len(actual_path)}")
+
+                            path_coords = [node for node, t in actual_path]
+                            routes.append(path_coords)
+                            drones_to_simulate.append(drone_obj)
                     else:
-                        print(f"❌ {d_id}: {result['reason']}")
+                        print(f"  ❌ {d_id}: {result['reason']}")
 
                 if routes:
                     simulation(
@@ -120,7 +138,6 @@ def main():
                         obstacles=fleet.no_fly_zones,
                         pre_planned=True
                     )
-
         elif choice == "10":
             from logger import get_champions
             champs = get_champions()
