@@ -44,12 +44,7 @@ def simulation(routes, drones, obstacles=None, pre_planned=False):
     fig.patch.set_facecolor("#e8edf2")
     ax.grid(color="white", linewidth=1.2)
     ax.set_axisbelow(True)
-    ax.yaxis.set_major_locator(loc(1))
-    ax.xaxis.set_major_locator(loc(1))
 
-    # Dynamic limits based on actual route data
-    ax.set_xlim(-25,25)
-    ax.set_ylim(-25,25)
   
 
     # Nice color palette — one color per drone
@@ -114,6 +109,27 @@ def simulation(routes, drones, obstacles=None, pre_planned=False):
         flying_shit[drn]["x"] = np.array(x)
         flying_shit[drn]["y"] = np.array(y)
 
+    all_x = np.concatenate([flying_shit[drn]["x"] for drn in range(len(flying_shit))])
+    all_y = np.concatenate([flying_shit[drn]["y"] for drn in range(len(flying_shit))])
+    max_x = np.max(all_x)
+    max_y = np.max(all_y)
+    low_x=np.min(all_x)
+    low_y=np.min(all_y)
+    ax.set_xlim(low_x-5,max_x+5)
+    ax.set_ylim(low_y-5,max_y+5) #limits for axes
+    test_x=max(max_x,abs(low_x))
+    test_y=max(max_y,abs(low_y))
+    if  test_x<200:
+        ax.xaxis.set_major_locator(loc(1))
+    elif test_x<550:
+        ax.xaxis.set_major_locator(loc(5))
+    else:   ax.xaxis.set_major_locator(loc(10))
+    if  test_y<200:
+        ax.yaxis.set_major_locator(loc(1))
+    elif test_y<550:
+        ax.yaxis.set_major_locator(loc(5))
+    else:   ax.yaxis.set_major_locator(loc(10))
+   
     max_frames = max(len(flying_shit[drn]["x"]) for drn in range(len(flying_shit)))
 
     def animate(frame):
