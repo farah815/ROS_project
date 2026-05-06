@@ -6,7 +6,15 @@ from Orchestrator import orchestrate_missions
 from Weather_System import WeatherSystem
 from simulation import simulation
 from Execution import execute_flight
-
+import os
+from time import time
+cur_os = os.name
+def clear():
+    if cur_os=='nt':
+        os.system("cls")
+    else:
+        os.system("clear")
+        
 def main():
     fleet = Fleet()
     fleet.load_from_file()  # auto-loads on startup
@@ -30,49 +38,94 @@ def main():
 
         if choice == "1":
             drone_id = input("Enter Drone ID: ").strip().upper()
-            drone_mass = float(input("Drone mass: "))
-            max_payload = int(input("Max Payload: "))
-            battery = int(input("Battery (default 100): ") or 100)
+            while 1:
+                try:
+                    drone_mass = float(input("Drone mass: "))
+                    if drone_mass:
+                        break
+                    else: print("drone_mass can't be zero")
+                except ValueError:
+                    print("❌ Invalid input, try again.")
+            while 1:
+                try:
+                    max_payload = float(input("Max Payload: "))
+                    if max_payload:
+                        break
+                    else: print("Payload can't be zero")
+                except ValueError:
+                    print("❌ Invalid input, try again.")
+            while 1:
+                try:
+                    battery = float(input("Battery (default 100): ") or 100)
+                    break
+                except ValueError:
+                    print("❌ Invalid input, try again.")
             drone = Drone(drone_id,drone_mass ,max_payload, battery)
             fleet.add_drone(drone)
+            clear()
             print("✅ Drone added")
 
         elif choice == "2":
             package_id = input("Package ID: ")
-            weight = int(input("Weight: "))
-            x = int(input("Destination X: "))
-            y = int(input("Destination Y: "))
+            while 1:
+                try:
+                    weight = float(input("Weight: "))
+                    if weight:
+                        break
+                    else: print("battery can't be zero")
+                except ValueError:
+                    print("❌ Invalid input, try again.")
+            while 1:
+                try:
+                    x = float(input("Destination X: "))
+                    y = float(input("Destination Y: "))
+                    break
+                except ValueError:
+                    print("❌ Invalid input, try again.")
             package = Package(package_id, weight, (x, y))
             fleet.add_package(package)
+            clear()
             print("✅ Package added")
 
         elif choice == "3":
-            x = int(input("X: "))
-            y = int(input("Y: "))
+            while 1:
+                try:
+                    x = float(input("X: "))
+                    y = float(input("Y: "))
+                    break
+                except ValueError:
+                    print("❌ Invalid input, try again.") 
             fleet.add_no_fly_zone([(x, y)])
+            clear()
             print("✅ No-fly zone added")
 
         elif choice == "4":
             fleet.assign_packages()
+            clear()
             print("✅ Packages assigned")
 
         elif choice == "5":
+            clear()
             fleet.show_status()
 
         elif choice == "6":
             fleet.save_to_file()
+            clear()
             print("💾 Saved successfully")
 
         elif choice == "7":
             fleet.load_from_file()
+            clear()
             print("📂 Loaded successfully")
 
         elif choice == "8":
+            clear()
             print("\n🏆 Top Drones:")
             for d in fleet.top_drones():
                 print(d)
 
         elif choice == "9":
+            t=time()
             # Build the grid
             grid = Grid(20, 20)
             grid.register_no_fly_zones([tuple(z) for z in fleet.no_fly_zones])
@@ -132,18 +185,22 @@ def main():
                         print(f"  ❌ {d_id}: {result['reason']}")
 
                 if routes:
+                    print(time()-t)
                     simulation(
                         routes,
                         drones_to_simulate,
                         obstacles=fleet.no_fly_zones,
                         pre_planned=True
                     )
+            
         elif choice == "10":
             from logger import get_champions
             champs = get_champions()
             if not champs:
+                clear()
                 print("⚠️  No logs yet. Run a simulation first.")
             else:
+                clear()
                 print("\n🏆 CHAMPIONS OF EFFICIENCY")
                 print(f"{'Rank':<6}{'Drone ID':<12}{'Missions':<10}{'Battery Left'}")
                 print("-" * 40)
@@ -152,11 +209,13 @@ def main():
 
         elif choice == "0":
             fleet.save_to_file()  # auto-save on exit
+            clear()
             print("💾 Fleet saved.")
             print("👋 Exiting...")
             break
 
         else:
+            clear()
             print("❌ Invalid choice, try again.")
 
 
