@@ -40,7 +40,7 @@ class Drone:
 
     def return_to_base(self):
         self.position = (0, 0)
-        self.status = "returning"
+        self.status = "idle"
         self.package_id = None    
     
     def should_return_home(self, steps_to_home):

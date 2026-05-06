@@ -10,12 +10,12 @@ class Fleet:
         self.no_fly_zones = []  
 
   
-    def add_drone(self, Drone):
-        self.drones.append(Drone)
+    def add_drone(self, drone):
+        self.drones.append(drone)
 
    
-    def add_package(self, Package):
-        self.packages.append(Package)
+    def add_package(self, package):
+        self.packages.append(package)
 
 
     def add_no_fly_zone(self, zone_points):

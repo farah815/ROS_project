@@ -9,7 +9,8 @@
                 0
             ],
             "status": "delivering",
-            "package_id": "P1"
+            "package_id": "P1",
+            "missions_completed": 0
         },
         {
             "drone_id": "D2",
@@ -20,7 +21,32 @@
                 0
             ],
             "status": "idle",
-            "package_id": null
+            "package_id": null,
+            "missions_completed": 0
+        },
+        {
+            "drone_id": "20",
+            "max_payload": 10,
+            "battery": 50,
+            "position": [
+                0,
+                0
+            ],
+            "status": "idle",
+            "package_id": null,
+            "missions_completed": 0
+        },
+        {
+            "drone_id": "d1",
+            "max_payload": 20,
+            "battery": 50,
+            "position": [
+                0,
+                0
+            ],
+            "status": "idle",
+            "package_id": null,
+            "missions_completed": 0
         }
     ],
     "packages": [
